@@ -1,285 +1,130 @@
 package com.example.countryapp
 
-
-import android.app.AlertDialog
-import android.app.DatePickerDialog
-import android.app.TimePickerDialog
 import android.os.Bundle
+import android.view.View
+import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import android.widget.Toast
+import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AppCompatActivity
 import com.example.countryapp.databinding.ActivityMainBinding
+import java.text.SimpleDateFormat
+import java.util.Calendar
+import java.util.Locale
 
-
-class MainActivity :
-    AppCompatActivity(),
-    DatePickerDialog.OnDateSetListener,
-    TimePickerDialog.OnTimeSetListener {
-
+class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
 
-
-    private val countries = arrayOf(
-        "Indonesia",
-        "United States",
-        "United Kingdom",
-        "Germany",
-        "France",
-        "Australia",
-        "Japan",
-        "China",
-        "Brazil",
-        "Canada"
-    )
-
+    private var selectedYear = 0
+    private var selectedMonth = 0
+    private var selectedDay = 0
+    private var selectedHour = 0
+    private var selectedMinute = 0
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        val attendanceStatuses = resources.getStringArray(R.array.attendance_status)
 
+        with(binding) {
+            selectedYear = datePicker.year
+            selectedMonth = datePicker.month
+            selectedDay = datePicker.dayOfMonth
 
-        val provinces =
-            resources.getStringArray(R.array.provinces)
+            timePicker.setIs24HourView(false)
+            selectedHour = timePicker.hour
+            selectedMinute = timePicker.minute
 
-
-
-        with(binding){
-
-
-            val countryAdapter =
-                ArrayAdapter(
-                    this@MainActivity,
-                    android.R.layout.simple_spinner_item,
-                    countries
-                )
-
-
-            countryAdapter.setDropDownViewResource(
+            val statusAdapter = ArrayAdapter(
+                this@MainActivity,
+                android.R.layout.simple_spinner_item,
+                attendanceStatuses,
+            )
+            statusAdapter.setDropDownViewResource(
                 android.R.layout.simple_spinner_dropdown_item
             )
+            spinnerStatus.adapter = statusAdapter
 
-
-            spinnerCountry.adapter =
-                countryAdapter
-
-
-
-            val provinceAdapter =
-                ArrayAdapter(
-                    this@MainActivity,
-                    android.R.layout.simple_spinner_item,
-                    provinces
-                )
-
-
-            provinceAdapter.setDropDownViewResource(
-                android.R.layout.simple_spinner_dropdown_item
-            )
-
-
-            spinnerProvinces.adapter =
-                provinceAdapter
-
-
-
-            spinnerCountry.setOnItemSelectedListener(
-                object :
-                    android.widget.AdapterView.OnItemSelectedListener {
-
-
-                    override fun onItemSelected(
-                        parent: android.widget.AdapterView<*>,
-                        view: android.view.View?,
-                        position: Int,
-                        id: Long
-                    ) {
-
-
-                        Toast.makeText(
-                            this@MainActivity,
-                            countries[position],
-                            Toast.LENGTH_SHORT
-                        ).show()
-
+            spinnerStatus.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+                override fun onItemSelected(
+                    parent: AdapterView<*>,
+                    view: View?,
+                    position: Int,
+                    id: Long
+                ) {
+                    if (position == 0) {
+                        etKeterangan.visibility = View.GONE
+                        etKeterangan.text?.clear()
+                    } else {
+                        etKeterangan.visibility = View.VISIBLE
                     }
-
-
-                    override fun onNothingSelected(
-                        parent: android.widget.AdapterView<*>
-                    ) {}
-
                 }
-            )
 
-
+                override fun onNothingSelected(parent: AdapterView<*>) {}
+            }
 
             datePicker.init(
-                datePicker.year,
-                datePicker.month,
-                datePicker.dayOfMonth
-            ){
-                    _,year,month,day ->
-
-                val date =
-                    "$day/${month+1}/$year"
-
-                Toast.makeText(
-                    this@MainActivity,
-                    date,
-                    Toast.LENGTH_SHORT
-                ).show()
-
+                selectedYear,
+                selectedMonth,
+                selectedDay
+            ) { _, year, month, day ->
+                selectedYear = year
+                selectedMonth = month
+                selectedDay = day
             }
 
-
-
-            timePicker.setOnTimeChangedListener{
-                    _,hour,minute ->
-
-                val time =
-                    String.format(
-                        "%02d:%02d",
-                        hour,
-                        minute
-                    )
-
-
-                Toast.makeText(
-                    this@MainActivity,
-                    time,
-                    Toast.LENGTH_SHORT
-                ).show()
-
+            timePicker.setOnTimeChangedListener { _, hourOfDay, minute ->
+                selectedHour = hourOfDay
+                selectedMinute = minute
             }
 
+            btnSubmit.setOnClickListener {
+                val calendar = Calendar.getInstance().apply {
+                    set(selectedYear, selectedMonth, selectedDay)
+                }
+                val dateFormat = SimpleDateFormat("d MMMM yyyy", Locale.ENGLISH)
+                val formattedDate = dateFormat.format(calendar.time)
 
-
-
-            btnShowCalendar.setOnClickListener {
-
-                DatePicker()
-                    .show(
-                        supportFragmentManager,
-                        "datePicker"
-                    )
-
-            }
-
-
-
-
-            btnShowTimePicker.setOnClickListener {
-
-                TimePicker()
-                    .show(
-                        supportFragmentManager,
-                        "timePicker"
-                    )
-
-            }
-
-
-
-
-            btnShowAlertDialog.setOnClickListener {
-
-
-                val builder =
-                    AlertDialog.Builder(this@MainActivity)
-
-
-                builder.setTitle("Keluar")
-
-                builder.setMessage(
-                    "Apakah Anda yakin ingin keluar dari aplikasi?"
+                val amPm = if (selectedHour < 12) "AM" else "PM"
+                val hour12 = when {
+                    selectedHour == 0 -> 12
+                    selectedHour > 12 -> selectedHour - 12
+                    else -> selectedHour
+                }
+                val formattedTime = String.format(
+                    Locale.US,
+                    "%02d:%02d %s",
+                    hour12,
+                    selectedMinute,
+                    amPm
                 )
 
-
-                builder.setPositiveButton("Ya"){
-                        _,_ ->
-
-                    finish()
-
-                }
-
-
-                builder.setNegativeButton("Tidak"){
-                        dialog,_ ->
-
-                    dialog.dismiss()
-
-                }
-
-
-                builder.create().show()
-
+                val message = "Presensi berhasil $formattedDate jam $formattedTime"
+                tvResult.text = message
+                tvResult.visibility = View.VISIBLE
+                Toast.makeText(this@MainActivity, message, Toast.LENGTH_SHORT).show()
             }
 
-
-
-            btnShowCustomDialog.setOnClickListener {
-
-                DialogExit()
-                    .show(
-                        supportFragmentManager,
-                        "dialogExit"
-                    )
-
+            btnExit.setOnClickListener {
+                showExitDialog()
             }
-
-
         }
 
+        onBackPressedDispatcher.addCallback(
+            object : OnBackPressedCallback(true) {
+                override fun handleOnBackPressed() {
+                    showExitDialog()
+                }
+            }
+        )
     }
 
-
-
-    override fun onDateSet(
-        view: android.widget.DatePicker?,
-        year:Int,
-        month:Int,
-        day:Int
-    ){
-
-        val date =
-            "$day/${month+1}/$year"
-
-
-        Toast.makeText(
-            this,
-            date,
-            Toast.LENGTH_SHORT
-        ).show()
-
+    private fun showExitDialog() {
+        DialogExit().show(supportFragmentManager, "dialogExit")
     }
-
-
-
-    override fun onTimeSet(
-        view: android.widget.TimePicker?,
-        hour:Int,
-        minute:Int
-    ){
-
-        val time =
-            String.format(
-                "%02d:%02d",
-                hour,
-                minute
-            )
-
-
-        Toast.makeText(
-            this,
-            time,
-            Toast.LENGTH_SHORT
-        ).show()
-
-    }
-
 }
+

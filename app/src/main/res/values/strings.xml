@@ -2,10 +2,27 @@
 
   <string name="app_name">Country App</string>
 
+  <string name="presensi_title">Presensi</string>
+  <string name="hint_keterangan">Keterangan</string>
+  <string name="btn_submit">Submit</string>
+  <string name="exit_description">Keluar</string>
+
+  <string name="dialog_exit_title">Keluar</string>
+  <string name="dialog_exit_message">Apakah anda yakin ingin keluar?</string>
+  <string name="dialog_exit_yes">Ya</string>
+  <string name="dialog_exit_no">Tidak</string>
+
   <string name="show_calendar">Show Calendar</string>
   <string name="show_time_picker">Show Time Picker</string>
   <string name="show_alert_dialog">Show Alert Dialog</string>
   <string name="show_custom_dialog">Show Custom Dialog</string>
+
+  <string-array name="attendance_status">
+    <item>Hadir Tepat Waktu</item>
+    <item>Sakit</item>
+    <item>Terlambat</item>
+    <item>Izin</item>
+  </string-array>
 
   <array name="provinces">
     <item>Aceh</item>
