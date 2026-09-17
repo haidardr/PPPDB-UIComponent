@@ -1,0 +1,23 @@
+<resources>
+
+  <string name="app_name">Country App</string>
+
+  <string name="show_calendar">Show Calendar</string>
+  <string name="show_time_picker">Show Time Picker</string>
+  <string name="show_alert_dialog">Show Alert Dialog</string>
+  <string name="show_custom_dialog">Show Custom Dialog</string>
+
+  <array name="provinces">
+    <item>Aceh</item>
+    <item>Bali</item>
+    <item>Banten</item>
+    <item>Bengkulu</item>
+    <item>Gorontalo</item>
+    <item>Jakarta</item>
+    <item>Jambi</item>
+    <item>Jawa Barat</item>
+    <item>Jawa Tengah</item>
+    <item>Jawa Timur</item>
+  </array>
+
+</resources>
